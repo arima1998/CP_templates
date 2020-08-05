@@ -1,0 +1,87 @@
+vector<int>arr[1001];
+const int maxN = 10;
+int level[1001],LCA[1001][maxN+1];
+void dfs(int curr,int lvl,int par)
+{
+    level[curr]=lvl;
+    LCA[curr][0]=par;
+
+    for(int child:arr[curr])
+    {
+        if(child!=par)
+        {
+            dfs(child,lvl+1,curr);
+        }
+    }
+}
+void init(int n)
+{
+    dfs(1,0,-1);
+    for(int i=1;i<=maxN;i++)
+    {
+        for(int j=1;j<=n;j++)
+        {
+            if(LCA[j][i-1]!=-1)
+            {
+                int par = LCA[j][i-1];
+                LCA[j][i]=LCA[par][i-1];
+            }
+        }
+    }
+
+}
+int getlca(int a,int b)
+{
+    if(level[b]<level[a])swap(a,b);
+    int d= level[b]-level[a];
+    while(d>0)
+    {
+        int i=log2(d);
+        b=LCA[b][i];
+        d-= 1<<i ;
+    }
+    if(a==b)return a;
+
+    for(int i=maxN ; i>=0 ; i--)
+    {
+        if(LCA[a][i]!=-1 and (LCA[a][i] != LCA[b][i]))
+        {
+            a=LCA[a][i] ;
+            b=LCA[b][i];
+        }
+    }
+    return LCA[a][0];
+}
+int getdist(int a,int b)
+{
+    int l = getlca( a, b);
+    cout<<"LCA="<<l<<endl;
+    cout<<"LEv A="<<level[a]<<" LEve B="<<level[b]<<endl;
+    int g=level[a] + level[b] - 2*level[l];
+    return g;
+}
+
+int main()
+{
+    int n;cin>>n;
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=0;j<=maxN;j++)
+        {
+            LCA[i][j]=-1;
+        }
+    }
+    for(int i=1;i<n;i++)
+    {
+        int a,b;cin>>a>>b;
+        arr[a].pb(b);arr[b].pb(a);
+    }
+    cout<<"INPUT done --------------\n";
+    init(n);
+    int q;cin>>q;
+    while(q--)
+    {
+        int a,b;cin>>a>>b;
+        cout<<getdist(a,b)<<endl;
+    }
+}
