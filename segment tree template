@@ -1,5 +1,5 @@
 lli tree[4*maxn],a[maxn];
-
+lli lazy[4*maxn];
 void build(int node,int l,int r)
 {
     if(l==r)
@@ -34,4 +34,54 @@ lli query(int node,int l,int r,int st,int ed)
     lli x=query(2*node,l,mid,st,ed);
     lli y=query(2*node+1,mid+1,r,st,ed);
     return x+y;
+}
+void updateRange(int node,int start,int end,int l,int r,int val)
+{
+    if(lazy[node]!=0)
+    {
+        tree[node]+=(end-start+1)*lazy[node];
+        if(start!=end)
+        {
+            lazy[2*node]+=lazy[node];
+            lazy[2*node+1]+=lazy[node];
+        }
+        lazy[node]=0;
+    }
+    if(start > end)return;
+    if(start > r or end <l)return;
+    if(start >=l and end <= r)
+    {
+        tree[node]+=(end-start+1)*val;
+        if(start!=end)
+        {
+            lazy[2*node]+=val;
+            lazy[2*node+1]+=val;
+        }
+        return;
+    }
+    int mid=(start+end)/2;
+    updateRange(2*node,start,mid,l,r,val);
+    updateRange(2*node+1,mid+1,end,l,r,val);
+    tree[node]=tree[2*node]+tree[2*node+1];
+
+}
+
+int queryRange(int node,int start,int end,int l,int r)
+{
+    if(start > end or start > r or end < l)return 0;
+    if(lazy[node] != 0)
+    {
+        tree[node] += (end - start + 1) * lazy[node];
+        if(start != end)
+        {
+            lazy[node*2] += lazy[node];
+            lazy[node*2+1] += lazy[node];
+        }
+        lazy[node] = 0;
+    }
+    if(start >= l and end <= r)return tree[node];
+    int mid = (start + end) / 2;
+    int p1 = queryRange(node*2, start, mid, l, r);
+    int p2 = queryRange(node*2 + 1, mid + 1, end, l, r);
+    return (p1 + p2);
 }
