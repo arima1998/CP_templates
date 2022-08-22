@@ -1,0 +1,37 @@
+lli tree[4*maxn],a[maxn];
+
+void build(int node,int l,int r)
+{
+    if(l==r)
+    {
+        tree[node]=a[l];return;
+    }
+    int mid=(l+r)/2;
+    build(2*node,l,mid);
+    build(2*node+1,mid+1,r);
+    tree[node]=tree[2*node]+tree[2*node+1];
+}
+void emptySack(int node,int l,int r,int idx,int v)
+{
+    if(l>idx or r<idx)return;
+    if(l==r)
+    {
+        if(v==-1)tree[node]=0;
+        else tree[node]+=v;
+        return;
+    }
+    int mid=(l+r)/2;
+    if(idx <= mid)emptySack(2*node,l,mid,idx,v);
+    else emptySack(2*node+1,mid+1,r,idx,v);
+    tree[node]=tree[2*node]+tree[2*node+1];
+}
+lli query(int node,int l,int r,int st,int ed)
+{
+    if(l>r)return 0;
+    if(l>ed or r<st)return 0;
+    if(l>=st and r<=ed)return tree[node];
+    int mid=(l+r)/2;
+    lli x=query(2*node,l,mid,st,ed);
+    lli y=query(2*node+1,mid+1,r,st,ed);
+    return x+y;
+}
