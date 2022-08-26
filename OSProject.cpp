@@ -1,5 +1,5 @@
 //// 1804113-CSE-CUET
-
+//// if copy , do it in ur risk coz a lot is adjusted to my own favor
 
 #include<bits/stdc++.h>
 using namespace std;
