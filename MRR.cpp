@@ -1,8 +1,31 @@
 #include<bits/stdc++.h>
 using namespace std;
+#define lli long long int
+#define lld long double
+#define ul  unsigned long int
 #define pii pair<int,int>
+#define pll pair<lli, lli>
+#define vi  vector<int>
+#define vii vector<pair<int,int>>
+#define vll vector<lli>
+#define pb  push_back
+#define mpr  make_pair
 #define ss second
 #define ff first
+#define pie 3.14159265358979323846264338327950L
+#define all(x) x.begin(),x.end()
+#define testcase() int tc;cin>>tc;while(tc--)
+#define clean(x,y) memset(x,y,sizeof(x))
+#define getunique(v) {sort(all(v)); v.erase(unique(all(v)), v.end());}
+#define loop(i,st,ed) for(int i=st;i<=ed;i++)
+#define debug cout<<"HERE is ok"<<endl
+template<typename A> ostream& operator<<(ostream &cout, vector<A> const &v) {cout << "["; for(int i = 0; i < v.size(); i++) {if (i) cout << ", "; cout << v[i];} return cout << "]";}
+template<typename A, typename B> ostream& operator<<(ostream &cout, pair<A, B> const &p) { return cout << "(" << p.ff << ", " << p.ss << ")"; }
+template<typename A>ostream& operator<<(ostream &cout , set<A>const &s){cout<<"[";for(A i:s){cout<<i<<" ";}return cout<<"]";}
+template<typename A, typename B> istream& operator>>(istream& cin, pair<A, B> &p) {
+	cin >> p.first;
+	return cin >> p.second;
+}
 
 struct compare{
     bool operator()(const pii & a, const pii & b)
@@ -11,95 +34,115 @@ struct compare{
     }
 };
 
+void showQ(queue<pii>q)
+{
+    while(!q.empty())
+    {
+        cout<<"("<<q.front().ff<<" "<<q.front().ss<<" )";
+        q.pop();
+    }
+    cout<<endl;
+}
+
 int main()
 {
+
     int n;
     cout<<"Input number of process: ";
     cin>>n;
     int burstTime[n+1],arrivalTime[n+1];
     int waitingTime[n+1],turnaroundTime[n+1];
-    int startTime[n+1],endTime[n+1],responseTime[n+1];
+    int startTime[n+1],endTime[n+1],responseTime[n+1],timeQuantum;
     vector<pair<int,int>>process;
     vector<pii>granttChart;
     for(int i=1;i<=n;i++)
     {
-        cout<<"Enter Arrival Time of process P"<<i<<": ";
+        cout<<"Enter Arrival Time of P"<<i<<": ";
         cin>>arrivalTime[i];
-        cout<<"Enter Burst Time of process P"<<i<<": ";
+        cout<<"Enter Burst Time of P"<<i<<": ";
         cin>>burstTime[i];
-
         process.push_back({arrivalTime[i],i});
         startTime[i]=INT_MAX;
     }
-    sort(process.begin(),process.end(),[](pii a,pii b){return a.ff <= b.ff ;});
-    int curTime=0;
-    int totalidleTime=0;
+    int totalSum=0;
+    for(int i=1;i<=n;i++)totalSum+=burstTime[i];
+    int elem=n;
 
-    queue<pii>p;
-    for(int i=0;i<n;i++){
-        p.push(process[i]);
-    }
-    priority_queue<pii,vector<pii>,compare>WaitingQ;
-    int SUM=0,ELEM=n;
-    for(int i=1;i<=n;i++)SUM+=burstTime[i];
-    int avg=SUM/n;
-
-    auto TQGEN= [](int avg){
+   auto TQGEN= [](int avg){
         return avg + (rand()%10);
     };
-    int TQ=TQGEN(avg);
-    int pTQ=TQ;
+    timeQuantum=TQGEN(totalSum/elem);
 
-    while(!p.empty() or !WaitingQ.empty())
+    sort(process.begin(),process.end(),[](pii a,pii b){return a.ff <= b.ff ;});
+    int curTime=0;
+    int totalidleTime=0,pTQ=timeQuantum;
+    queue<pii>currentProcess;
+    bool vis[n+1]={0};
+    int done=0;
+
+
+
+    while(1)
     {
-        while(!p.empty() and p.front().ff <=curTime)
+        if(done == n)break;
+        if(currentProcess.empty())
         {
-            pii P=p.front(); /// p.ff == arrivalTime,p.ss==ID
-            p.pop();
-            int id=P.ss;
-            WaitingQ.push({burstTime[id],id});
-        }
-        while(WaitingQ.empty())
-        {
-            pii P=p.front();
-            p.pop();
-            int id=P.ss;
-            int diff=P.ff-curTime;
-            if(diff > 0)
+            for(int i=0;i<n;i++)
             {
-                granttChart.push_back({curTime,-1});
-                totalidleTime+=diff;
+                int id=process[i].ss;
+                if(vis[id] == false)
+                {
+                    currentProcess.push({burstTime[id],id});
+                    vis[id]=1;
+                    break;
+                }
             }
-            WaitingQ.push({burstTime[id],id});
         }
-        pii P=WaitingQ.top();
-        int id=P.ss;
-        WaitingQ.pop();
-        curTime=max(curTime,arrivalTime[id]);
+        pii job=currentProcess.front();
+        currentProcess.pop();
+        int id=job.ss;
+        if(curTime<arrivalTime[id])
+        {
+            int diff=arrivalTime[id]-curTime;
+            totalidleTime+=diff;
+            granttChart.pb({curTime,-1});
+        }
+        curTime=max(arrivalTime[id],curTime);
         startTime[id]=min(startTime[id],curTime);
-        granttChart.push_back({curTime,id});
-        if(P.ff > pTQ)
+        granttChart.pb({curTime,id});
+        int remTime=job.ff;
+        if(remTime > pTQ)
         {
-            P.ff-=pTQ;
-            SUM-=pTQ;
             curTime+=pTQ;
-            pTQ=TQ;
-            WaitingQ.push(P);
+            remTime-=pTQ;
+            totalSum-=pTQ;
+            pTQ=timeQuantum;
         }
-        else
+        else{
+            curTime+=remTime;
+            totalSum-=remTime;
+            remTime=0;
+            done++;
+            elem--;
+            elem=max(1,elem);
+            pTQ=TQGEN(totalSum/elem);
+        }
+        endTime[id]=curTime;
+        for(int k=0;k<n;k++)
         {
-            pTQ-=P.ff;
-            SUM-=P.ff;
-            curTime+=P.ff;
-            endTime[id]=curTime;
-            P.ff=0;
-            ELEM--;
-            if(pTQ == 0){
-                avg=SUM/max(ELEM,1);
-                pTQ=TQGEN(avg);
+            int id_=process[k].ss;
+            if(vis[id_] == false and arrivalTime[id_] <=  curTime)
+            {
+                currentProcess.push({burstTime[id_],id_});
+                vis[id_]=1;
             }
+        }
+        if(remTime > 0)
+        {
+            currentProcess.push({remTime,id});
         }
     }
+
     cout<<"Grantt Chart"<<endl;
     for(pii i:granttChart)
     {
