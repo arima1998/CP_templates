@@ -861,6 +861,7 @@ void CompareAll()
     auto ans7=MRR();
     cout.clear();
     cout<<"Algorithm: 7    Average Waiting Time: "<<ans7.ff<<" Average Turnaround Time: "<<ans7.ss<<endl;
+    globalTrigger=0;
 }
 
 int main()
