@@ -2,6 +2,7 @@
 //// if copy , do it in ur risk coz a lot is adjusted to my own favor
 
 #include<bits/stdc++.h>
+#include<conio.h>
 using namespace std;
 #define lli long long int
 #define lld long double
@@ -914,5 +915,9 @@ int main()
         {
             CompareAll();
         }
+        cout<<"Press any key for home page......";
+        cin.ignore();
+        _getch();
+        system("CLS");
     }
 }
