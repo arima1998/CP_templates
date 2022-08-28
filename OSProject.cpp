@@ -393,7 +393,7 @@ pair<double,double>NPPS()
     int curTime=0;
     int totalidleTime=0,done=0,vis[n+1]={0};
     priority_queue<piii , vector<piii>,comparePriority>currentProcess;
-    cout<<process<<endl;
+    //cout<<process<<endl;
 
     while(1)
     {
