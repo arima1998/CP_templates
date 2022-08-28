@@ -705,7 +705,7 @@ pair<double,double>MRR()
     int elem=n;
 
    auto TQGEN= [](int avg){
-        return avg + (rand()%10);
+        return (avg+avg)/2 + (rand()%10);
     };
     timeQuantum=TQGEN(totalSum/elem);
 
