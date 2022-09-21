@@ -1,3 +1,6 @@
+/// VARIFIED with https://codeforces.com/contest/1000/submission/172958336
+
+
 #include<bits/stdc++.h>
 using namespace std;
 #define lli long long int
@@ -56,7 +59,7 @@ vector<pii> adj[maxn]; // adjacency list of graph
 vector<int>BridgeTree[maxn]; // bridgeTree
 
 vector<bool> visited;
-vector<int> tin, low,component;
+vector<int> tin, low,component,level;
 int isBridge[maxn];
 int timer;
 
@@ -103,6 +106,40 @@ void ConstructBridgeTree(int u,int c)
     }
 
 }
+int ComputeLevel(int s)
+{
+    visited.assign(n+1,false);
+    queue<int>q;
+    visited[s]=1;
+    level.assign(n+1,0);
+
+    q.push(s);
+    while(!q.empty())
+    {
+        int u=q.front();
+        q.pop();
+        for(int v:BridgeTree[u])
+        {
+            if(visited[v]==0)
+            {
+                level[v]=level[u]+1;
+                visited[v]=1;
+                q.push(v);
+            }
+        }
+    }
+    pii maxNode={0,0};
+    for(int i=1;i<=n;i++)
+    {
+        if(level[i] > maxNode.ff)
+        {
+            maxNode={level[i],i};
+        }
+    }
+    return maxNode.ss;
+
+}
+
 void solve()
 {
     cin>>n>>m;
@@ -137,7 +174,10 @@ void solve()
             BridgeTree[component[a]].pb(component[b]);
             BridgeTree[component[b]].pb(component[a]);
         }
-    }    
+    }
+    int NODE1=ComputeLevel(1);
+    int NODE2=ComputeLevel(NODE1);
+    cout<<level[NODE2]<<endl;
 
 }
 
