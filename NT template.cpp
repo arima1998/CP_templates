@@ -26,3 +26,30 @@ vector<int>factorization(int n)
     }
     return res;
 }
+
+///----------------------------------------- Sieve Factor ----------------------------------------
+
+bool vis[maxn];
+
+void Sieve(){
+    memset(vis, true, sizeof(vis));
+
+    vis[0] = vis[1] = false;
+    for(int i = 4 ; i < maxn ; i += 2)
+        vis[i] = false;
+    for(int i = 3 ; i < maxn / i ; i += 2){
+        if(!vis[i])continue;
+        for(int j = i * i ; j < maxn ; j += i + i)
+            vis[j] = false;
+    }
+}
+
+vector<int> primes;
+
+void Gen(){
+    for(int i = 2 ; i < maxn ; ++i)
+        if(vis[i])
+            primes.emplace_back(i);
+}
+
+/// --------------------------------------- Sieve ---------------- can factor 1E9 fast {<=SQRT(1E9)}
